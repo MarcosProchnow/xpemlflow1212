@@ -78,18 +78,22 @@ class IrisInput(BaseModel):
 @app.post("/predict/")
 async def predict(input_data: IrisInput):
     try:
-        # Converter os dados de entrada em um array NumPy
-        data = np.array([[input_data.sepal_length, input_data.sepal_width,
-                          input_data.petal_length, input_data.petal_width]])
-        
-        # Fazer a previsão usando o modelo treinado
-        prediction = model.predict(data)
-        
-        # Retornar a previsão como resposta
+        # Converter para DataFrame com nomes das colunas corretos
+        df = pd.DataFrame([{
+            "sepal_length": input_data.sepal_length,
+            "sepal_width": input_data.sepal_width,
+            "petal_length": input_data.petal_length,
+            "petal_width": input_data.petal_width
+        }])
+
+        # Fazer a previsão
+        prediction = model.predict(df)
+
         return {"predicted_species": prediction[0]}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 # Endpoint de verificação de saúde
 @app.get("/health")
 async def health_check():
@@ -98,4 +102,6 @@ async def health_check():
 # Executar o servidor localmente (para testes)
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    #uvicorn.run(app, host="127.0.0.1", port=8000)
+    port = int(os.environ.get("PORT", 8000))  # Obtém a porta do ambiente (Render define automaticamente)
+    uvicorn.run(app, host="0.0.0.0", port=port)

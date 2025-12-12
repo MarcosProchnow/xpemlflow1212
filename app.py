@@ -78,22 +78,21 @@ class IrisInput(BaseModel):
 @app.post("/predict/")
 async def predict(input_data: IrisInput):
     try:
-        # Converter para DataFrame com nomes das colunas corretos
-        df = pd.DataFrame([{
-            "sepal_length": input_data.sepal_length,
-            "sepal_width": input_data.sepal_width,
-            "petal_length": input_data.petal_length,
-            "petal_width": input_data.petal_width
-        }])
-
-        # Fazer a previsão
-        prediction = model.predict(df)
-
+        # CORREÇÃO AQUI: Criar um DataFrame com os nomes das colunas
+        # Isso garante que o formato seja idêntico ao usado no treino (X_train)
+        data = pd.DataFrame([
+            [input_data.sepal_length, input_data.sepal_width, 
+             input_data.petal_length, input_data.petal_width]
+        ], columns=['sepal_length', 'sepal_width', 'petal_length', 'petal_width'])
+        
+        # Fazer a previsão usando o modelo treinado
+        prediction = model.predict(data)
+        
+        # Retornar a previsão como resposta
         return {"predicted_species": prediction[0]}
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 # Endpoint de verificação de saúde
 @app.get("/health")
 async def health_check():

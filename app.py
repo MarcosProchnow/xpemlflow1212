@@ -27,6 +27,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Configurar o MLflow
 # mlflow.set_tracking_uri("http://127.0.0.1:5000")  # URI do servidor MLflow (opcional)
+mlflow.set_tracking_uri("file:./mlruns")
 mlflow.set_experiment("Iris_Classification_Experiment")
 
 # Treinar o modelo Random Forest com MLflow
